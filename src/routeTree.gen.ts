@@ -9,16 +9,35 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as MoviesRouteImport } from './routes/movies'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as MoviesSlugRouteImport } from './routes/movies.$slug'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedAdminRouteRouteImport } from './routes/_authenticated/admin/route'
+import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin/index'
 import { Route as AuthenticatedPaymentBookingIdRouteImport } from './routes/_authenticated/payment.$bookingId'
 import { Route as AuthenticatedConfirmationBookingIdRouteImport } from './routes/_authenticated/confirmation.$bookingId'
 import { Route as AuthenticatedBookingShowIdRouteImport } from './routes/_authenticated/booking.$showId'
+import { Route as AuthenticatedAdminUsersRouteImport } from './routes/_authenticated/admin/users'
+import { Route as AuthenticatedAdminShowsRouteImport } from './routes/_authenticated/admin/shows'
+import { Route as AuthenticatedAdminMoviesRouteImport } from './routes/_authenticated/admin/movies'
+import { Route as AuthenticatedAdminBookingsRouteImport } from './routes/_authenticated/admin/bookings'
+import { Route as ApiPublicCronReleaseSeatsRouteImport } from './routes/api/public/cron/release-seats'
 
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const MoviesRoute = MoviesRouteImport.update({
   id: '/movies',
   path: '/movies',
@@ -48,6 +67,16 @@ const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedAdminRouteRoute = AuthenticatedAdminRouteRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AuthenticatedAdminRouteRoute,
+} as any)
 const AuthenticatedPaymentBookingIdRoute =
   AuthenticatedPaymentBookingIdRouteImport.update({
     id: '/payment/$bookingId',
@@ -66,26 +95,71 @@ const AuthenticatedBookingShowIdRoute =
     path: '/booking/$showId',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedAdminUsersRoute = AuthenticatedAdminUsersRouteImport.update({
+  id: '/users',
+  path: '/users',
+  getParentRoute: () => AuthenticatedAdminRouteRoute,
+} as any)
+const AuthenticatedAdminShowsRoute = AuthenticatedAdminShowsRouteImport.update({
+  id: '/shows',
+  path: '/shows',
+  getParentRoute: () => AuthenticatedAdminRouteRoute,
+} as any)
+const AuthenticatedAdminMoviesRoute =
+  AuthenticatedAdminMoviesRouteImport.update({
+    id: '/movies',
+    path: '/movies',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
+const AuthenticatedAdminBookingsRoute =
+  AuthenticatedAdminBookingsRouteImport.update({
+    id: '/bookings',
+    path: '/bookings',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
+const ApiPublicCronReleaseSeatsRoute =
+  ApiPublicCronReleaseSeatsRouteImport.update({
+    id: '/api/public/cron/release-seats',
+    path: '/api/public/cron/release-seats',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/movies': typeof MoviesRouteWithChildren
+  '/reset-password': typeof ResetPasswordRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/admin': typeof AuthenticatedAdminRouteRouteWithChildren
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/movies/$slug': typeof MoviesSlugRoute
+  '/admin/bookings': typeof AuthenticatedAdminBookingsRoute
+  '/admin/movies': typeof AuthenticatedAdminMoviesRoute
+  '/admin/shows': typeof AuthenticatedAdminShowsRoute
+  '/admin/users': typeof AuthenticatedAdminUsersRoute
   '/booking/$showId': typeof AuthenticatedBookingShowIdRoute
   '/confirmation/$bookingId': typeof AuthenticatedConfirmationBookingIdRoute
   '/payment/$bookingId': typeof AuthenticatedPaymentBookingIdRoute
+  '/admin/': typeof AuthenticatedAdminIndexRoute
+  '/api/public/cron/release-seats': typeof ApiPublicCronReleaseSeatsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/movies': typeof MoviesRouteWithChildren
+  '/reset-password': typeof ResetPasswordRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/movies/$slug': typeof MoviesSlugRoute
+  '/admin/bookings': typeof AuthenticatedAdminBookingsRoute
+  '/admin/movies': typeof AuthenticatedAdminMoviesRoute
+  '/admin/shows': typeof AuthenticatedAdminShowsRoute
+  '/admin/users': typeof AuthenticatedAdminUsersRoute
   '/booking/$showId': typeof AuthenticatedBookingShowIdRoute
   '/confirmation/$bookingId': typeof AuthenticatedConfirmationBookingIdRoute
   '/payment/$bookingId': typeof AuthenticatedPaymentBookingIdRoute
+  '/admin': typeof AuthenticatedAdminIndexRoute
+  '/api/public/cron/release-seats': typeof ApiPublicCronReleaseSeatsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -93,11 +167,20 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/movies': typeof MoviesRouteWithChildren
+  '/reset-password': typeof ResetPasswordRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/_authenticated/admin': typeof AuthenticatedAdminRouteRouteWithChildren
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/movies/$slug': typeof MoviesSlugRoute
+  '/_authenticated/admin/bookings': typeof AuthenticatedAdminBookingsRoute
+  '/_authenticated/admin/movies': typeof AuthenticatedAdminMoviesRoute
+  '/_authenticated/admin/shows': typeof AuthenticatedAdminShowsRoute
+  '/_authenticated/admin/users': typeof AuthenticatedAdminUsersRoute
   '/_authenticated/booking/$showId': typeof AuthenticatedBookingShowIdRoute
   '/_authenticated/confirmation/$bookingId': typeof AuthenticatedConfirmationBookingIdRoute
   '/_authenticated/payment/$bookingId': typeof AuthenticatedPaymentBookingIdRoute
+  '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
+  '/api/public/cron/release-seats': typeof ApiPublicCronReleaseSeatsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -105,32 +188,58 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/movies'
+    | '/reset-password'
+    | '/sitemap.xml'
+    | '/admin'
     | '/dashboard'
     | '/movies/$slug'
+    | '/admin/bookings'
+    | '/admin/movies'
+    | '/admin/shows'
+    | '/admin/users'
     | '/booking/$showId'
     | '/confirmation/$bookingId'
     | '/payment/$bookingId'
+    | '/admin/'
+    | '/api/public/cron/release-seats'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/auth'
     | '/movies'
+    | '/reset-password'
+    | '/sitemap.xml'
     | '/dashboard'
     | '/movies/$slug'
+    | '/admin/bookings'
+    | '/admin/movies'
+    | '/admin/shows'
+    | '/admin/users'
     | '/booking/$showId'
     | '/confirmation/$bookingId'
     | '/payment/$bookingId'
+    | '/admin'
+    | '/api/public/cron/release-seats'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
     | '/auth'
     | '/movies'
+    | '/reset-password'
+    | '/sitemap.xml'
+    | '/_authenticated/admin'
     | '/_authenticated/dashboard'
     | '/movies/$slug'
+    | '/_authenticated/admin/bookings'
+    | '/_authenticated/admin/movies'
+    | '/_authenticated/admin/shows'
+    | '/_authenticated/admin/users'
     | '/_authenticated/booking/$showId'
     | '/_authenticated/confirmation/$bookingId'
     | '/_authenticated/payment/$bookingId'
+    | '/_authenticated/admin/'
+    | '/api/public/cron/release-seats'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -138,10 +247,27 @@ export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
   MoviesRoute: typeof MoviesRouteWithChildren
+  ResetPasswordRoute: typeof ResetPasswordRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  ApiPublicCronReleaseSeatsRoute: typeof ApiPublicCronReleaseSeatsRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/movies': {
       id: '/movies'
       path: '/movies'
@@ -184,6 +310,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin': {
+      id: '/_authenticated/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AuthenticatedAdminRouteRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/admin/': {
+      id: '/_authenticated/admin/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
     '/_authenticated/payment/$bookingId': {
       id: '/_authenticated/payment/$bookingId'
       path: '/payment/$bookingId'
@@ -205,10 +345,68 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedBookingShowIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin/users': {
+      id: '/_authenticated/admin/users'
+      path: '/users'
+      fullPath: '/admin/users'
+      preLoaderRoute: typeof AuthenticatedAdminUsersRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/shows': {
+      id: '/_authenticated/admin/shows'
+      path: '/shows'
+      fullPath: '/admin/shows'
+      preLoaderRoute: typeof AuthenticatedAdminShowsRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/movies': {
+      id: '/_authenticated/admin/movies'
+      path: '/movies'
+      fullPath: '/admin/movies'
+      preLoaderRoute: typeof AuthenticatedAdminMoviesRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/bookings': {
+      id: '/_authenticated/admin/bookings'
+      path: '/bookings'
+      fullPath: '/admin/bookings'
+      preLoaderRoute: typeof AuthenticatedAdminBookingsRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/api/public/cron/release-seats': {
+      id: '/api/public/cron/release-seats'
+      path: '/api/public/cron/release-seats'
+      fullPath: '/api/public/cron/release-seats'
+      preLoaderRoute: typeof ApiPublicCronReleaseSeatsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
+interface AuthenticatedAdminRouteRouteChildren {
+  AuthenticatedAdminBookingsRoute: typeof AuthenticatedAdminBookingsRoute
+  AuthenticatedAdminMoviesRoute: typeof AuthenticatedAdminMoviesRoute
+  AuthenticatedAdminShowsRoute: typeof AuthenticatedAdminShowsRoute
+  AuthenticatedAdminUsersRoute: typeof AuthenticatedAdminUsersRoute
+  AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
+}
+
+const AuthenticatedAdminRouteRouteChildren: AuthenticatedAdminRouteRouteChildren =
+  {
+    AuthenticatedAdminBookingsRoute: AuthenticatedAdminBookingsRoute,
+    AuthenticatedAdminMoviesRoute: AuthenticatedAdminMoviesRoute,
+    AuthenticatedAdminShowsRoute: AuthenticatedAdminShowsRoute,
+    AuthenticatedAdminUsersRoute: AuthenticatedAdminUsersRoute,
+    AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
+  }
+
+const AuthenticatedAdminRouteRouteWithChildren =
+  AuthenticatedAdminRouteRoute._addFileChildren(
+    AuthenticatedAdminRouteRouteChildren,
+  )
+
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAdminRouteRoute: typeof AuthenticatedAdminRouteRouteWithChildren
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedBookingShowIdRoute: typeof AuthenticatedBookingShowIdRoute
   AuthenticatedConfirmationBookingIdRoute: typeof AuthenticatedConfirmationBookingIdRoute
@@ -216,6 +414,7 @@ interface AuthenticatedRouteRouteChildren {
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAdminRouteRoute: AuthenticatedAdminRouteRouteWithChildren,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedBookingShowIdRoute: AuthenticatedBookingShowIdRoute,
   AuthenticatedConfirmationBookingIdRoute:
@@ -242,6 +441,9 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
   MoviesRoute: MoviesRouteWithChildren,
+  ResetPasswordRoute: ResetPasswordRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
+  ApiPublicCronReleaseSeatsRoute: ApiPublicCronReleaseSeatsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
