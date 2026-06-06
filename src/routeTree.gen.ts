@@ -9,11 +9,21 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as MoviesRouteImport } from './routes/movies'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as MoviesSlugRouteImport } from './routes/movies.$slug'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedPaymentBookingIdRouteImport } from './routes/_authenticated/payment.$bookingId'
+import { Route as AuthenticatedConfirmationBookingIdRouteImport } from './routes/_authenticated/confirmation.$bookingId'
+import { Route as AuthenticatedBookingShowIdRouteImport } from './routes/_authenticated/booking.$showId'
 
+const MoviesRoute = MoviesRouteImport.update({
+  id: '/movies',
+  path: '/movies',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
@@ -28,50 +38,117 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const MoviesSlugRoute = MoviesSlugRouteImport.update({
+  id: '/$slug',
+  path: '/$slug',
+  getParentRoute: () => MoviesRoute,
+} as any)
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedPaymentBookingIdRoute =
+  AuthenticatedPaymentBookingIdRouteImport.update({
+    id: '/payment/$bookingId',
+    path: '/payment/$bookingId',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedConfirmationBookingIdRoute =
+  AuthenticatedConfirmationBookingIdRouteImport.update({
+    id: '/confirmation/$bookingId',
+    path: '/confirmation/$bookingId',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedBookingShowIdRoute =
+  AuthenticatedBookingShowIdRouteImport.update({
+    id: '/booking/$showId',
+    path: '/booking/$showId',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/movies': typeof MoviesRouteWithChildren
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/movies/$slug': typeof MoviesSlugRoute
+  '/booking/$showId': typeof AuthenticatedBookingShowIdRoute
+  '/confirmation/$bookingId': typeof AuthenticatedConfirmationBookingIdRoute
+  '/payment/$bookingId': typeof AuthenticatedPaymentBookingIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/movies': typeof MoviesRouteWithChildren
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/movies/$slug': typeof MoviesSlugRoute
+  '/booking/$showId': typeof AuthenticatedBookingShowIdRoute
+  '/confirmation/$bookingId': typeof AuthenticatedConfirmationBookingIdRoute
+  '/payment/$bookingId': typeof AuthenticatedPaymentBookingIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
+  '/movies': typeof MoviesRouteWithChildren
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/movies/$slug': typeof MoviesSlugRoute
+  '/_authenticated/booking/$showId': typeof AuthenticatedBookingShowIdRoute
+  '/_authenticated/confirmation/$bookingId': typeof AuthenticatedConfirmationBookingIdRoute
+  '/_authenticated/payment/$bookingId': typeof AuthenticatedPaymentBookingIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/auth' | '/dashboard'
+  fullPaths:
+    | '/'
+    | '/auth'
+    | '/movies'
+    | '/dashboard'
+    | '/movies/$slug'
+    | '/booking/$showId'
+    | '/confirmation/$bookingId'
+    | '/payment/$bookingId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/dashboard'
+  to:
+    | '/'
+    | '/auth'
+    | '/movies'
+    | '/dashboard'
+    | '/movies/$slug'
+    | '/booking/$showId'
+    | '/confirmation/$bookingId'
+    | '/payment/$bookingId'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
     | '/auth'
+    | '/movies'
     | '/_authenticated/dashboard'
+    | '/movies/$slug'
+    | '/_authenticated/booking/$showId'
+    | '/_authenticated/confirmation/$bookingId'
+    | '/_authenticated/payment/$bookingId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
+  MoviesRoute: typeof MoviesRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/movies': {
+      id: '/movies'
+      path: '/movies'
+      fullPath: '/movies'
+      preLoaderRoute: typeof MoviesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/auth': {
       id: '/auth'
       path: '/auth'
@@ -93,6 +170,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/movies/$slug': {
+      id: '/movies/$slug'
+      path: '/$slug'
+      fullPath: '/movies/$slug'
+      preLoaderRoute: typeof MoviesSlugRouteImport
+      parentRoute: typeof MoviesRoute
+    }
     '/_authenticated/dashboard': {
       id: '/_authenticated/dashboard'
       path: '/dashboard'
@@ -100,24 +184,64 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/payment/$bookingId': {
+      id: '/_authenticated/payment/$bookingId'
+      path: '/payment/$bookingId'
+      fullPath: '/payment/$bookingId'
+      preLoaderRoute: typeof AuthenticatedPaymentBookingIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/confirmation/$bookingId': {
+      id: '/_authenticated/confirmation/$bookingId'
+      path: '/confirmation/$bookingId'
+      fullPath: '/confirmation/$bookingId'
+      preLoaderRoute: typeof AuthenticatedConfirmationBookingIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/booking/$showId': {
+      id: '/_authenticated/booking/$showId'
+      path: '/booking/$showId'
+      fullPath: '/booking/$showId'
+      preLoaderRoute: typeof AuthenticatedBookingShowIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedBookingShowIdRoute: typeof AuthenticatedBookingShowIdRoute
+  AuthenticatedConfirmationBookingIdRoute: typeof AuthenticatedConfirmationBookingIdRoute
+  AuthenticatedPaymentBookingIdRoute: typeof AuthenticatedPaymentBookingIdRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedBookingShowIdRoute: AuthenticatedBookingShowIdRoute,
+  AuthenticatedConfirmationBookingIdRoute:
+    AuthenticatedConfirmationBookingIdRoute,
+  AuthenticatedPaymentBookingIdRoute: AuthenticatedPaymentBookingIdRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
   AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
+interface MoviesRouteChildren {
+  MoviesSlugRoute: typeof MoviesSlugRoute
+}
+
+const MoviesRouteChildren: MoviesRouteChildren = {
+  MoviesSlugRoute: MoviesSlugRoute,
+}
+
+const MoviesRouteWithChildren =
+  MoviesRoute._addFileChildren(MoviesRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
+  MoviesRoute: MoviesRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
