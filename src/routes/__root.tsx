@@ -13,6 +13,7 @@ import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { CustomCursor } from "../components/CustomCursor";
 import { supabase } from "../integrations/supabase/client";
+import { Toaster } from "sonner";
 
 function NotFoundComponent() {
   return (
@@ -101,6 +102,7 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <CustomCursor />
+      <Toaster theme="dark" position="top-center" richColors />
       <Outlet />
     </QueryClientProvider>
   );
