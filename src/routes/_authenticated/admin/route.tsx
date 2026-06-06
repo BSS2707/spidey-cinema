@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Navbar } from "@/components/Navbar";
 
 export const Route = createFileRoute("/_authenticated/admin")({
+  ssr: false,
   beforeLoad: async ({ context, location }) => {
     const userId = (context as any).user?.id;
     if (!userId) throw redirect({ to: "/auth", search: { mode: "signin", redirect: location.href } });
