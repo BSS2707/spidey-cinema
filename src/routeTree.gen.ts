@@ -15,6 +15,7 @@ import { Route as MoviesRouteImport } from './routes/movies'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as MoviesIndexRouteImport } from './routes/movies.index'
 import { Route as MoviesSlugRouteImport } from './routes/movies.$slug'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedAdminRouteRouteImport } from './routes/_authenticated/admin/route'
@@ -56,6 +57,11 @@ const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const MoviesIndexRoute = MoviesIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => MoviesRoute,
 } as any)
 const MoviesSlugRoute = MoviesSlugRouteImport.update({
   id: '/$slug',
@@ -133,6 +139,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AuthenticatedAdminRouteRouteWithChildren
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/movies/$slug': typeof MoviesSlugRoute
+  '/movies/': typeof MoviesIndexRoute
   '/admin/bookings': typeof AuthenticatedAdminBookingsRoute
   '/admin/movies': typeof AuthenticatedAdminMoviesRoute
   '/admin/shows': typeof AuthenticatedAdminShowsRoute
@@ -146,11 +153,11 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
-  '/movies': typeof MoviesRouteWithChildren
   '/reset-password': typeof ResetPasswordRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/movies/$slug': typeof MoviesSlugRoute
+  '/movies': typeof MoviesIndexRoute
   '/admin/bookings': typeof AuthenticatedAdminBookingsRoute
   '/admin/movies': typeof AuthenticatedAdminMoviesRoute
   '/admin/shows': typeof AuthenticatedAdminShowsRoute
@@ -172,6 +179,7 @@ export interface FileRoutesById {
   '/_authenticated/admin': typeof AuthenticatedAdminRouteRouteWithChildren
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/movies/$slug': typeof MoviesSlugRoute
+  '/movies/': typeof MoviesIndexRoute
   '/_authenticated/admin/bookings': typeof AuthenticatedAdminBookingsRoute
   '/_authenticated/admin/movies': typeof AuthenticatedAdminMoviesRoute
   '/_authenticated/admin/shows': typeof AuthenticatedAdminShowsRoute
@@ -193,6 +201,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/dashboard'
     | '/movies/$slug'
+    | '/movies/'
     | '/admin/bookings'
     | '/admin/movies'
     | '/admin/shows'
@@ -206,11 +215,11 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/auth'
-    | '/movies'
     | '/reset-password'
     | '/sitemap.xml'
     | '/dashboard'
     | '/movies/$slug'
+    | '/movies'
     | '/admin/bookings'
     | '/admin/movies'
     | '/admin/shows'
@@ -231,6 +240,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin'
     | '/_authenticated/dashboard'
     | '/movies/$slug'
+    | '/movies/'
     | '/_authenticated/admin/bookings'
     | '/_authenticated/admin/movies'
     | '/_authenticated/admin/shows'
@@ -295,6 +305,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/movies/': {
+      id: '/movies/'
+      path: '/'
+      fullPath: '/movies/'
+      preLoaderRoute: typeof MoviesIndexRouteImport
+      parentRoute: typeof MoviesRoute
     }
     '/movies/$slug': {
       id: '/movies/$slug'
@@ -427,10 +444,12 @@ const AuthenticatedRouteRouteWithChildren =
 
 interface MoviesRouteChildren {
   MoviesSlugRoute: typeof MoviesSlugRoute
+  MoviesIndexRoute: typeof MoviesIndexRoute
 }
 
 const MoviesRouteChildren: MoviesRouteChildren = {
   MoviesSlugRoute: MoviesSlugRoute,
+  MoviesIndexRoute: MoviesIndexRoute,
 }
 
 const MoviesRouteWithChildren =
@@ -448,3 +467,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
