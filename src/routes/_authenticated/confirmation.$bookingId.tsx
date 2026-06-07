@@ -1,6 +1,5 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import QRCode from "qrcode";
 import { PDFDocument, rgb, StandardFonts } from "pdf-lib";
 import { supabase } from "@/integrations/supabase/client";
 import { Navbar } from "@/components/Navbar";
@@ -28,7 +27,12 @@ function ConfirmationPage() {
   const seats = (booking.booking_seats ?? []).map((bs: any) => `${bs.seats.row_label}${bs.seats.seat_number}`).join(", ");
 
   useEffect(() => {
-    QRCode.toDataURL(booking.qr_token, { width: 200, margin: 1 }).then(setQr);
+    let cancelled = false;
+    import("qrcode")
+      .then(({ default: QRCode }) => QRCode.toDataURL(booking.qr_token, { width: 200, margin: 1 }))
+      .then((dataUrl) => { if (!cancelled) setQr(dataUrl); })
+      .catch(() => { if (!cancelled) setQr(""); });
+    return () => { cancelled = true; };
   }, [booking.qr_token]);
 
   const downloadPdf = async () => {
