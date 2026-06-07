@@ -72,7 +72,11 @@ function MovieDetail() {
         <div>
           <h2 className="font-display text-2xl tracking-wider mb-4">Showtimes</h2>
           <div className="space-y-3">
-            {shows.length === 0 && <p className="text-muted-foreground text-sm">No upcoming shows.</p>}
+            {shows.length === 0 && (
+              <div className="glass-card p-4 rounded-lg text-sm text-muted-foreground">
+                No upcoming shows yet. <Link to="/movies" className="text-primary underline" data-cursor="hover">Browse other movies</Link> or check back soon.
+              </div>
+            )}
             {shows.map((s) => (
               <Link
                 key={s.id} to="/booking/$showId" params={{ showId: s.id }} data-cursor="hover"
