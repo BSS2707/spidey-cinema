@@ -84,17 +84,18 @@ export const confirmPayment = createServerFn({ method: "POST" })
     const { data: booking } = await supabase.from("bookings").select("id,user_id").eq("id", data.bookingId).single();
     if (!booking || booking.user_id !== userId) throw new Error("Booking not found");
 
-    const { error } = await supabase
+    // Payment-state transitions use the admin client; user RLS no longer permits writing payment fields.
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { error } = await supabaseAdmin
       .from("bookings")
       .update({ status: "CONFIRMED", payment_status: "PAID", upi_utr: data.utr })
       .eq("id", data.bookingId);
     if (error) throw new Error(error.message);
 
-    // Mark seats BOOKED
-    const { data: bs } = await supabase.from("booking_seats").select("seat_id").eq("booking_id", data.bookingId);
+    const { data: bs } = await supabaseAdmin.from("booking_seats").select("seat_id").eq("booking_id", data.bookingId);
     const seatIds = (bs ?? []).map((r) => r.seat_id);
     if (seatIds.length) {
-      await supabase.from("seats").update({ status: "BOOKED", locked_until: null, locked_by: null }).in("id", seatIds);
+      await supabaseAdmin.from("seats").update({ status: "BOOKED", locked_until: null, locked_by: null }).in("id", seatIds);
     }
     return { ok: true };
   });
