@@ -19,7 +19,7 @@ function MoviesPage() {
         .from("movies")
         .select("id,title,slug,poster_url,genres,duration_min,rating,language,release_date")
         .eq("is_active", true)
-        .order("release_date", { ascending: false });
+        .order("created_at", { ascending: false });
       if (error) throw error;
       return data ?? [];
     },
