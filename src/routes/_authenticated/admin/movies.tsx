@@ -19,8 +19,13 @@ function AdminMovies() {
 
   const blank = { title: "", slug: "", synopsis: "", poster_url: "", backdrop_url: "", duration_min: 120, genres: "", language: "English", rating: "UA", release_date: "", trailer_url: "", is_active: true };
 
+  const slugify = (s: string) =>
+    s.toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 80) || `movie-${Date.now()}`;
+
   const save = async (form: any) => {
-    const payload = { ...form, genres: typeof form.genres === "string" ? form.genres.split(",").map((g: string) => g.trim()).filter(Boolean) : form.genres, duration_min: Number(form.duration_min) || 120, release_date: form.release_date || null };
+    if (!form.title?.trim()) return toast.error("Title is required");
+    const slug = (form.slug && form.slug.trim()) ? slugify(form.slug) : slugify(form.title);
+    const payload = { ...form, slug, genres: typeof form.genres === "string" ? form.genres.split(",").map((g: string) => g.trim()).filter(Boolean) : form.genres, duration_min: Number(form.duration_min) || 120, release_date: form.release_date || null };
     const res = editing?.id
       ? await supabase.from("movies").update(payload).eq("id", editing.id)
       : await supabase.from("movies").insert(payload);
@@ -64,7 +69,7 @@ function AdminMovies() {
             <h3 className="font-display text-2xl tracking-wider mb-4">{editing.id ? "Edit" : "New"} Movie</h3>
             <div className="grid grid-cols-2 gap-3">
               <Field label="Title" value={editing.title} onChange={(v) => setEditing({ ...editing, title: v })} />
-              <Field label="Slug" value={editing.slug} onChange={(v) => setEditing({ ...editing, slug: v })} />
+              <Field label="Slug (auto if blank)" value={editing.slug} onChange={(v) => setEditing({ ...editing, slug: v })} placeholder="leave blank to auto-generate" />
               <Field label="Poster URL" value={editing.poster_url || ""} onChange={(v) => setEditing({ ...editing, poster_url: v })} />
               <Field label="Backdrop URL" value={editing.backdrop_url || ""} onChange={(v) => setEditing({ ...editing, backdrop_url: v })} />
               <Field label="Duration (min)" value={String(editing.duration_min)} onChange={(v) => setEditing({ ...editing, duration_min: v })} />
