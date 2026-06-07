@@ -44,22 +44,23 @@ function MovieDetail() {
     <div className="min-h-screen bg-background">
       <Navbar />
       {/* Backdrop */}
-      <div className="relative h-[60vh] w-full overflow-hidden">
+      <div className="relative min-h-[70vh] sm:h-[60vh] w-full overflow-hidden pt-16">
         {movie.backdrop_url && <img src={movie.backdrop_url} alt={movie.title} className="absolute inset-0 h-full w-full object-cover" />}
         <div className="absolute inset-0 bg-gradient-to-b from-background/40 via-background/60 to-background" />
-        <div className="absolute bottom-0 left-0 right-0 container mx-auto px-6 pb-10">
-          <div className="flex flex-col md:flex-row gap-8 items-end">
-            {movie.poster_url && <img src={movie.poster_url} alt="" className="w-44 rounded-lg shadow-spidey" />}
-            <div className="flex-1">
-              <p className="font-display tracking-[0.4em] text-accent text-xs">{movie.genres?.join(" • ")}</p>
-              <h1 className="font-display text-5xl md:text-7xl tracking-wider mt-2">{movie.title}</h1>
-              <p className="text-muted-foreground mt-2">{movie.duration_min}min • {movie.language} • {movie.rating}</p>
+        <div className="absolute bottom-0 left-0 right-0 container mx-auto px-4 sm:px-6 pb-8 sm:pb-10">
+          <div className="flex flex-col md:flex-row gap-4 sm:gap-8 md:items-end">
+            {movie.poster_url && <img src={movie.poster_url} alt="" className="w-28 sm:w-36 md:w-44 rounded-lg shadow-spidey" />}
+            <div className="flex-1 min-w-0">
+              <p className="font-display tracking-[0.3em] sm:tracking-[0.4em] text-accent text-[10px] sm:text-xs">{movie.genres?.join(" • ")}</p>
+              <h1 className="font-display text-3xl sm:text-5xl md:text-7xl tracking-wider mt-2 break-words">{movie.title}</h1>
+              <p className="text-muted-foreground mt-2 text-sm sm:text-base">{movie.duration_min}min • {movie.language} • {movie.rating}</p>
             </div>
           </div>
         </div>
       </div>
 
-      <div className="container mx-auto px-6 py-12 grid md:grid-cols-3 gap-10">
+      <div className="container mx-auto px-4 sm:px-6 py-8 sm:py-12 grid md:grid-cols-3 gap-8 md:gap-10">
+
         <div className="md:col-span-2">
           <h2 className="font-display text-2xl tracking-wider mb-4">Synopsis</h2>
           <p className="text-muted-foreground leading-relaxed">{movie.synopsis}</p>
