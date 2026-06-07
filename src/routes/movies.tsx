@@ -40,13 +40,23 @@ function MoviesPage() {
         />
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
           {filtered.map((m) => (
-            <Link key={m.id} to="/movies/$slug" params={{ slug: m.slug }} data-cursor="hover" className="group block">
-              <div className="aspect-[2/3] overflow-hidden rounded-lg bg-card border border-border group-hover:border-primary transition-all">
-                {m.poster_url && <img src={m.poster_url} alt={m.title} className="h-full w-full object-cover group-hover:scale-110 transition-transform duration-700" />}
-              </div>
-              <h3 className="font-display tracking-wider mt-3">{m.title}</h3>
-              <p className="text-xs text-muted-foreground">{m.duration_min}min • {m.language}</p>
-            </Link>
+            <div key={m.id} className="group flex flex-col">
+              <Link to="/movies/$slug" params={{ slug: m.slug }} data-cursor="hover" className="block">
+                <div className="aspect-[2/3] overflow-hidden rounded-lg bg-card border border-border group-hover:border-primary transition-all">
+                  {m.poster_url && <img src={m.poster_url} alt={m.title} className="h-full w-full object-cover group-hover:scale-110 transition-transform duration-700" />}
+                </div>
+                <h3 className="font-display tracking-wider mt-3">{m.title}</h3>
+                <p className="text-xs text-muted-foreground">{m.duration_min}min • {m.language}</p>
+              </Link>
+              <Link
+                to="/movies/$slug"
+                params={{ slug: m.slug }}
+                data-cursor="hover"
+                className="mt-3 inline-flex items-center justify-center px-4 py-2 rounded-md bg-primary text-primary-foreground font-display tracking-wider text-xs uppercase hover:bg-primary/90 hover:shadow-spidey transition"
+              >
+                🎟 Book Ticket
+              </Link>
+            </div>
           ))}
         </div>
       </div>
