@@ -1,6 +1,5 @@
 import { createFileRoute, useNavigate, notFound } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import QRCode from "qrcode";
 import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { Navbar } from "@/components/Navbar";
@@ -43,7 +42,12 @@ function PaymentPage() {
   const upiUrl = `upi://pay?pa=${encodeURIComponent(UPI_VPA)}&pn=${encodeURIComponent(UPI_NAME)}&am=${Number(booking.total).toFixed(2)}&cu=INR&tn=${encodeURIComponent("Spidey-" + booking.id.slice(0, 8))}`;
 
   useEffect(() => {
-    QRCode.toDataURL(upiUrl, { color: { dark: "#E50914", light: "#0A0A0A" }, width: 300, margin: 1 }).then(setQr);
+    let cancelled = false;
+    import("qrcode")
+      .then(({ default: QRCode }) => QRCode.toDataURL(upiUrl, { color: { dark: "#E50914", light: "#0A0A0A" }, width: 300, margin: 1 }))
+      .then((dataUrl) => { if (!cancelled) setQr(dataUrl); })
+      .catch(() => { if (!cancelled) setQr(""); });
+    return () => { cancelled = true; };
   }, [upiUrl]);
 
   const handleSubmit = async () => {
