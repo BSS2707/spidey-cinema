@@ -19,8 +19,13 @@ function AdminMovies() {
 
   const blank = { title: "", slug: "", synopsis: "", poster_url: "", backdrop_url: "", duration_min: 120, genres: "", language: "English", rating: "UA", release_date: "", trailer_url: "", is_active: true };
 
+  const slugify = (s: string) =>
+    s.toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 80) || `movie-${Date.now()}`;
+
   const save = async (form: any) => {
-    const payload = { ...form, genres: typeof form.genres === "string" ? form.genres.split(",").map((g: string) => g.trim()).filter(Boolean) : form.genres, duration_min: Number(form.duration_min) || 120, release_date: form.release_date || null };
+    if (!form.title?.trim()) return toast.error("Title is required");
+    const slug = (form.slug && form.slug.trim()) ? slugify(form.slug) : slugify(form.title);
+    const payload = { ...form, slug, genres: typeof form.genres === "string" ? form.genres.split(",").map((g: string) => g.trim()).filter(Boolean) : form.genres, duration_min: Number(form.duration_min) || 120, release_date: form.release_date || null };
     const res = editing?.id
       ? await supabase.from("movies").update(payload).eq("id", editing.id)
       : await supabase.from("movies").insert(payload);
