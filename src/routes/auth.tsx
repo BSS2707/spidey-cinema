@@ -49,8 +49,15 @@ function AuthPage() {
       } else if (mode === "signin") {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
-        toast.success("Welcome back!");
-        navigate({ to: redirectTo || "/dashboard" });
+        // 2FA: sign out the password session, then email a 6-digit code
+        await supabase.auth.signOut();
+        const { error: otpErr } = await supabase.auth.signInWithOtp({
+          email,
+          options: { shouldCreateUser: false },
+        });
+        if (otpErr) throw otpErr;
+        toast.success("We emailed you a 6-digit verification code.");
+        navigate({ to: "/auth/verify-otp", search: { email, redirect: redirectTo } });
       } else {
         const { error } = await supabase.auth.resetPasswordForEmail(email, {
           redirectTo: `${window.location.origin}/reset-password`,
