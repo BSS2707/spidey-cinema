@@ -108,8 +108,8 @@ function VerifyOtpPage() {
           </MagneticButton>
 
           <div className="mt-6 text-sm text-muted-foreground flex flex-col gap-2 text-center">
-            <button onClick={resend} disabled={resending} className="hover:text-primary">
-              {resending ? "Sending..." : "Resend code"}
+            <button onClick={resend} disabled={resending || cooldown > 0} className="hover:text-primary disabled:opacity-50 disabled:cursor-not-allowed">
+              {resending ? "Sending..." : cooldown > 0 ? `Resend code (${cooldown}s)` : "Resend code"}
             </button>
             <Link to="/auth" search={{ mode: "signin" }} className="hover:text-primary">
               Back to sign in
