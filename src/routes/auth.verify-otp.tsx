@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Navbar } from "@/components/Navbar";
 import { MagneticButton } from "@/components/MagneticButton";
@@ -23,6 +23,25 @@ function VerifyOtpPage() {
   const [code, setCode] = useState("");
   const [loading, setLoading] = useState(false);
   const [resending, setResending] = useState(false);
+  const [cooldown, setCooldown] = useState(0);
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  useEffect(() => {
+    if (cooldown > 0) {
+      timerRef.current = setInterval(() => {
+        setCooldown((prev) => {
+          if (prev <= 1) {
+            if (timerRef.current) clearInterval(timerRef.current);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    }
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current);
+    };
+  }, [cooldown]);
 
   const verify = async (token: string) => {
     if (!email) return toast.error("Missing email. Please sign in again.");
@@ -41,12 +60,13 @@ function VerifyOtpPage() {
   };
 
   const resend = async () => {
-    if (!email) return;
+    if (!email || cooldown > 0) return;
     setResending(true);
     const { error } = await supabase.auth.signInWithOtp({ email, options: { shouldCreateUser: false } });
     setResending(false);
     if (error) return toast.error(error.message);
     toast.success("New code sent.");
+    setCooldown(60);
   };
 
   return (
@@ -88,8 +108,8 @@ function VerifyOtpPage() {
           </MagneticButton>
 
           <div className="mt-6 text-sm text-muted-foreground flex flex-col gap-2 text-center">
-            <button onClick={resend} disabled={resending} className="hover:text-primary">
-              {resending ? "Sending..." : "Resend code"}
+            <button onClick={resend} disabled={resending || cooldown > 0} className="hover:text-primary disabled:opacity-50 disabled:cursor-not-allowed">
+              {resending ? "Sending..." : cooldown > 0 ? `Resend code (${cooldown}s)` : "Resend code"}
             </button>
             <Link to="/auth" search={{ mode: "signin" }} className="hover:text-primary">
               Back to sign in
