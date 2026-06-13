@@ -48,8 +48,8 @@ export { loadValidCoupon };
 export const listCoupons = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    const { data: isAdmin } = await context.supabase.rpc("has_role", { _user_id: context.userId, _role: "admin" });
-    if (!isAdmin) throw new Error("Forbidden");
+    const { data: role } = await context.supabase.from("user_roles").select("role").eq("user_id", context.userId).eq("role", "admin").maybeSingle();
+    if (!role) throw new Error("Forbidden");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data, error } = await supabaseAdmin.from("coupons").select("*").order("created_at", { ascending: false });
     if (error) throw new Error(error.message);
@@ -68,8 +68,8 @@ export const createCoupon = createServerFn({ method: "POST" })
     active: z.boolean().default(true),
   }).parse(input))
   .handler(async ({ data, context }) => {
-    const { data: isAdmin } = await context.supabase.rpc("has_role", { _user_id: context.userId, _role: "admin" });
-    if (!isAdmin) throw new Error("Forbidden");
+    const { data: role } = await context.supabase.from("user_roles").select("role").eq("user_id", context.userId).eq("role", "admin").maybeSingle();
+    if (!role) throw new Error("Forbidden");
     if (data.discountType === "PERCENT" && data.value > 100) throw new Error("Percent must be ≤ 100");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { error } = await supabaseAdmin.from("coupons").insert({
@@ -89,8 +89,8 @@ export const toggleCoupon = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input) => z.object({ id: z.string().uuid(), active: z.boolean() }).parse(input))
   .handler(async ({ data, context }) => {
-    const { data: isAdmin } = await context.supabase.rpc("has_role", { _user_id: context.userId, _role: "admin" });
-    if (!isAdmin) throw new Error("Forbidden");
+    const { data: role } = await context.supabase.from("user_roles").select("role").eq("user_id", context.userId).eq("role", "admin").maybeSingle();
+    if (!role) throw new Error("Forbidden");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { error } = await supabaseAdmin.from("coupons").update({ active: data.active }).eq("id", data.id);
     if (error) throw new Error(error.message);
@@ -101,8 +101,8 @@ export const deleteCoupon = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input) => z.object({ id: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }) => {
-    const { data: isAdmin } = await context.supabase.rpc("has_role", { _user_id: context.userId, _role: "admin" });
-    if (!isAdmin) throw new Error("Forbidden");
+    const { data: role } = await context.supabase.from("user_roles").select("role").eq("user_id", context.userId).eq("role", "admin").maybeSingle();
+    if (!role) throw new Error("Forbidden");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { error } = await supabaseAdmin.from("coupons").delete().eq("id", data.id);
     if (error) throw new Error(error.message);
