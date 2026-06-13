@@ -5,6 +5,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { Navbar } from "@/components/Navbar";
 import { MagneticButton } from "@/components/MagneticButton";
 import { createBooking } from "@/lib/bookings.functions";
+import { validateCoupon } from "@/lib/coupons.functions";
+
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/booking/$showId")({
@@ -29,10 +31,14 @@ function BookingPage() {
   const { user } = Route.useRouteContext();
   const navigate = useNavigate();
   const create = useServerFn(createBooking);
+  const validate = useServerFn(validateCoupon);
   const [seats, setSeats] = useState<Seat[]>([]);
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [customer, setCustomer] = useState({ name: user.user_metadata?.full_name ?? "", email: user.email ?? "", phone: user.user_metadata?.phone ?? "" });
   const [loading, setLoading] = useState(false);
+  const [couponInput, setCouponInput] = useState("");
+  const [coupon, setCoupon] = useState<{ code: string; discount: number } | null>(null);
+  const [couponLoading, setCouponLoading] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -43,8 +49,33 @@ function BookingPage() {
 
   const priceFor = (t: string) => t === "PLATINUM" ? Number(show.price_platinum) : t === "GOLD" ? Number(show.price_gold) : Number(show.price_silver);
   const subtotal = seats.filter((s) => selected.has(s.id)).reduce((sum, s) => sum + priceFor(s.seat_type), 0);
-  const gst = +(subtotal * 0.18).toFixed(2);
-  const total = +(subtotal + gst).toFixed(2);
+  const discount = coupon ? Math.min(coupon.discount, subtotal) : 0;
+  const discounted = Math.max(0, subtotal - discount);
+  const gst = +(discounted * 0.18).toFixed(2);
+  const total = +(discounted + gst).toFixed(2);
+
+  const applyCoupon = async () => {
+    if (!couponInput.trim()) return;
+    if (subtotal === 0) return toast.error("Pick seats first");
+    setCouponLoading(true);
+    try {
+      const c = await validate({ data: { code: couponInput, subtotal } });
+      setCoupon({ code: c.code, discount: c.discount });
+      toast.success(`Coupon ${c.code} applied`);
+    } catch (e) { toast.error(e instanceof Error ? e.message : "Invalid coupon"); setCoupon(null); }
+    finally { setCouponLoading(false); }
+  };
+
+  // Re-validate discount when subtotal changes
+  useEffect(() => {
+    if (!coupon) return;
+    if (subtotal === 0) { setCoupon(null); return; }
+    validate({ data: { code: coupon.code, subtotal } })
+      .then((c) => setCoupon({ code: c.code, discount: c.discount }))
+      .catch(() => setCoupon(null));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [subtotal]);
+
 
   const toggle = (s: Seat) => {
     if (s.status === "BOOKED") return;
@@ -61,7 +92,7 @@ function BookingPage() {
     if (!customer.name || !customer.email || !customer.phone) return toast.error("Fill in your details");
     setLoading(true);
     try {
-      const res = await create({ data: { showId: show.id, seatIds: [...selected], customerName: customer.name, customerEmail: customer.email, customerPhone: customer.phone } });
+      const res = await create({ data: { showId: show.id, seatIds: [...selected], customerName: customer.name, customerEmail: customer.email, customerPhone: customer.phone, couponCode: coupon?.code ?? null } });
       navigate({ to: "/payment/$bookingId", params: { bookingId: res.bookingId } });
     } catch (e) { toast.error(e instanceof Error ? e.message : "Failed"); }
     finally { setLoading(false); }
@@ -136,12 +167,30 @@ function BookingPage() {
           <input value={customer.name} onChange={(e) => setCustomer({ ...customer, name: e.target.value })} placeholder="Full name" className="w-full px-3 py-2 rounded bg-input border border-border mb-2" />
           <input value={customer.email} onChange={(e) => setCustomer({ ...customer, email: e.target.value })} placeholder="Email" type="email" className="w-full px-3 py-2 rounded bg-input border border-border mb-2" />
           <input value={customer.phone} onChange={(e) => setCustomer({ ...customer, phone: e.target.value })} placeholder="Phone" className="w-full px-3 py-2 rounded bg-input border border-border mb-4" />
+          <div className="border-t border-border pt-4 mb-4">
+            <label className="text-xs font-display tracking-widest uppercase text-muted-foreground">Coupon</label>
+            {coupon ? (
+              <div className="mt-2 flex items-center justify-between gap-2 px-3 py-2 rounded bg-primary/10 border border-primary/40">
+                <span className="font-display tracking-wider text-primary text-sm">{coupon.code}</span>
+                <button onClick={() => { setCoupon(null); setCouponInput(""); }} className="text-xs text-muted-foreground hover:text-primary">Remove</button>
+              </div>
+            ) : (
+              <div className="mt-2 flex gap-2">
+                <input value={couponInput} onChange={(e) => setCouponInput(e.target.value.toUpperCase())} placeholder="ENTER CODE" className="flex-1 px-3 py-2 rounded bg-input border border-border text-sm uppercase tracking-wider" />
+                <button onClick={applyCoupon} disabled={couponLoading} className="px-3 py-2 rounded bg-accent/20 border border-accent/60 text-accent text-xs font-display tracking-widest uppercase hover:bg-accent/30 disabled:opacity-50">{couponLoading ? "..." : "Apply"}</button>
+              </div>
+            )}
+          </div>
           <div className="text-sm text-muted-foreground space-y-1 border-t border-border pt-4">
             <div className="flex justify-between"><span>Seats</span><span>{selected.size}</span></div>
             <div className="flex justify-between"><span>Subtotal</span><span>₹{subtotal.toFixed(2)}</span></div>
+            {discount > 0 && (
+              <div className="flex justify-between text-primary"><span>Discount {coupon ? `(${coupon.code})` : ""}</span><span>− ₹{discount.toFixed(2)}</span></div>
+            )}
             <div className="flex justify-between"><span>GST (18%)</span><span>₹{gst.toFixed(2)}</span></div>
             <div className="flex justify-between font-display text-foreground text-xl pt-2"><span>Total</span><span>₹{total.toFixed(2)}</span></div>
           </div>
+
           <MagneticButton onClick={handleProceed} disabled={loading || selected.size === 0} className="w-full mt-6">
             {loading ? "..." : "Proceed to Payment"}
           </MagneticButton>

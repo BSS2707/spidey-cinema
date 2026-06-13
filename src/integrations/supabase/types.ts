@@ -52,10 +52,12 @@ export type Database = {
       }
       bookings: {
         Row: {
+          coupon_code: string | null
           created_at: string
           customer_email: string | null
           customer_name: string | null
           customer_phone: string | null
+          discount: number
           gst: number
           id: string
           payment_status: Database["public"]["Enums"]["payment_status"]
@@ -69,10 +71,12 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          coupon_code?: string | null
           created_at?: string
           customer_email?: string | null
           customer_name?: string | null
           customer_phone?: string | null
+          discount?: number
           gst?: number
           id?: string
           payment_status?: Database["public"]["Enums"]["payment_status"]
@@ -86,10 +90,12 @@ export type Database = {
           user_id: string
         }
         Update: {
+          coupon_code?: string | null
           created_at?: string
           customer_email?: string | null
           customer_name?: string | null
           customer_phone?: string | null
+          discount?: number
           gst?: number
           id?: string
           payment_status?: Database["public"]["Enums"]["payment_status"]
@@ -111,6 +117,48 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      coupons: {
+        Row: {
+          active: boolean
+          code: string
+          created_at: string
+          discount_type: string
+          expires_at: string | null
+          id: string
+          max_uses: number | null
+          min_amount: number
+          updated_at: string
+          used_count: number
+          value: number
+        }
+        Insert: {
+          active?: boolean
+          code: string
+          created_at?: string
+          discount_type: string
+          expires_at?: string | null
+          id?: string
+          max_uses?: number | null
+          min_amount?: number
+          updated_at?: string
+          used_count?: number
+          value: number
+        }
+        Update: {
+          active?: boolean
+          code?: string
+          created_at?: string
+          discount_type?: string
+          expires_at?: string | null
+          id?: string
+          max_uses?: number | null
+          min_amount?: number
+          updated_at?: string
+          used_count?: number
+          value?: number
+        }
+        Relationships: []
       }
       movies: {
         Row: {

@@ -9,7 +9,7 @@ export const Route = createFileRoute("/_authenticated/confirmation/$bookingId")(
   loader: async ({ params }) => {
     const { data, error } = await supabase
       .from("bookings")
-      .select("id,total,subtotal,gst,status,payment_status,upi_utr,qr_token,customer_name,customer_email,customer_phone,created_at,shows(starts_at,screen_name,movies(title,poster_url)),booking_seats(seat_id,price,seats(row_label,seat_number,seat_type))")
+      .select("id,total,subtotal,gst,discount,coupon_code,status,payment_status,upi_utr,qr_token,customer_name,customer_email,customer_phone,created_at,shows(starts_at,screen_name,movies(title,poster_url)),booking_seats(seat_id,price,seats(row_label,seat_number,seat_type))")
       .eq("id", params.bookingId)
       .maybeSingle();
     if (error) throw error;
@@ -64,8 +64,10 @@ function ConfirmationPage() {
     line("Phone", booking.customer_phone ?? "");
     y -= 10;
     line("Subtotal", `INR ${Number(booking.subtotal).toFixed(2)}`);
+    if (Number(booking.discount ?? 0) > 0) line(`Discount${booking.coupon_code ? ` (${booking.coupon_code})` : ""}`, `- INR ${Number(booking.discount).toFixed(2)}`);
     line("GST (18%)", `INR ${Number(booking.gst).toFixed(2)}`);
     line("Total Paid", `INR ${Number(booking.total).toFixed(2)}`);
+
     line("Payment", `${booking.payment_status} ${booking.upi_utr ? `(UTR: ${booking.upi_utr})` : ""}`);
 
     // QR
@@ -110,8 +112,13 @@ function ConfirmationPage() {
             <Row label="Seats" value={seats} />
             <Row label="Customer" value={booking.customer_name} />
             <Row label="Subtotal" value={`₹${Number(booking.subtotal).toFixed(2)}`} />
+            <Row label="Subtotal" value={`₹${Number(booking.subtotal).toFixed(2)}`} />
+            {Number(booking.discount ?? 0) > 0 && (
+              <Row label={`Discount${booking.coupon_code ? ` (${booking.coupon_code})` : ""}`} value={`− ₹${Number(booking.discount).toFixed(2)}`} />
+            )}
             <Row label="GST (18%)" value={`₹${Number(booking.gst).toFixed(2)}`} />
             <Row label="Total" value={`₹${Number(booking.total).toFixed(2)}`} bold />
+
             <Row label="Payment" value={`${booking.payment_status}${booking.upi_utr ? ` • UTR ${booking.upi_utr}` : ""}`} />
           </div>
         </div>

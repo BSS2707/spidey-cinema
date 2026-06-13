@@ -27,6 +27,7 @@ import { Route as AuthenticatedBookingShowIdRouteImport } from './routes/_authen
 import { Route as AuthenticatedAdminUsersRouteImport } from './routes/_authenticated/admin/users'
 import { Route as AuthenticatedAdminShowsRouteImport } from './routes/_authenticated/admin/shows'
 import { Route as AuthenticatedAdminMoviesRouteImport } from './routes/_authenticated/admin/movies'
+import { Route as AuthenticatedAdminCouponsRouteImport } from './routes/_authenticated/admin/coupons'
 import { Route as AuthenticatedAdminBookingsRouteImport } from './routes/_authenticated/admin/bookings'
 import { Route as ApiPublicCronReleaseSeatsRouteImport } from './routes/api/public/cron/release-seats'
 
@@ -123,6 +124,12 @@ const AuthenticatedAdminMoviesRoute =
     path: '/movies',
     getParentRoute: () => AuthenticatedAdminRouteRoute,
   } as any)
+const AuthenticatedAdminCouponsRoute =
+  AuthenticatedAdminCouponsRouteImport.update({
+    id: '/coupons',
+    path: '/coupons',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
 const AuthenticatedAdminBookingsRoute =
   AuthenticatedAdminBookingsRouteImport.update({
     id: '/bookings',
@@ -148,6 +155,7 @@ export interface FileRoutesByFullPath {
   '/movies/$slug': typeof MoviesSlugRoute
   '/movies/': typeof MoviesIndexRoute
   '/admin/bookings': typeof AuthenticatedAdminBookingsRoute
+  '/admin/coupons': typeof AuthenticatedAdminCouponsRoute
   '/admin/movies': typeof AuthenticatedAdminMoviesRoute
   '/admin/shows': typeof AuthenticatedAdminShowsRoute
   '/admin/users': typeof AuthenticatedAdminUsersRoute
@@ -167,6 +175,7 @@ export interface FileRoutesByTo {
   '/movies/$slug': typeof MoviesSlugRoute
   '/movies': typeof MoviesIndexRoute
   '/admin/bookings': typeof AuthenticatedAdminBookingsRoute
+  '/admin/coupons': typeof AuthenticatedAdminCouponsRoute
   '/admin/movies': typeof AuthenticatedAdminMoviesRoute
   '/admin/shows': typeof AuthenticatedAdminShowsRoute
   '/admin/users': typeof AuthenticatedAdminUsersRoute
@@ -190,6 +199,7 @@ export interface FileRoutesById {
   '/movies/$slug': typeof MoviesSlugRoute
   '/movies/': typeof MoviesIndexRoute
   '/_authenticated/admin/bookings': typeof AuthenticatedAdminBookingsRoute
+  '/_authenticated/admin/coupons': typeof AuthenticatedAdminCouponsRoute
   '/_authenticated/admin/movies': typeof AuthenticatedAdminMoviesRoute
   '/_authenticated/admin/shows': typeof AuthenticatedAdminShowsRoute
   '/_authenticated/admin/users': typeof AuthenticatedAdminUsersRoute
@@ -213,6 +223,7 @@ export interface FileRouteTypes {
     | '/movies/$slug'
     | '/movies/'
     | '/admin/bookings'
+    | '/admin/coupons'
     | '/admin/movies'
     | '/admin/shows'
     | '/admin/users'
@@ -232,6 +243,7 @@ export interface FileRouteTypes {
     | '/movies/$slug'
     | '/movies'
     | '/admin/bookings'
+    | '/admin/coupons'
     | '/admin/movies'
     | '/admin/shows'
     | '/admin/users'
@@ -254,6 +266,7 @@ export interface FileRouteTypes {
     | '/movies/$slug'
     | '/movies/'
     | '/_authenticated/admin/bookings'
+    | '/_authenticated/admin/coupons'
     | '/_authenticated/admin/movies'
     | '/_authenticated/admin/shows'
     | '/_authenticated/admin/users'
@@ -402,6 +415,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminMoviesRouteImport
       parentRoute: typeof AuthenticatedAdminRouteRoute
     }
+    '/_authenticated/admin/coupons': {
+      id: '/_authenticated/admin/coupons'
+      path: '/coupons'
+      fullPath: '/admin/coupons'
+      preLoaderRoute: typeof AuthenticatedAdminCouponsRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
     '/_authenticated/admin/bookings': {
       id: '/_authenticated/admin/bookings'
       path: '/bookings'
@@ -421,6 +441,7 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedAdminRouteRouteChildren {
   AuthenticatedAdminBookingsRoute: typeof AuthenticatedAdminBookingsRoute
+  AuthenticatedAdminCouponsRoute: typeof AuthenticatedAdminCouponsRoute
   AuthenticatedAdminMoviesRoute: typeof AuthenticatedAdminMoviesRoute
   AuthenticatedAdminShowsRoute: typeof AuthenticatedAdminShowsRoute
   AuthenticatedAdminUsersRoute: typeof AuthenticatedAdminUsersRoute
@@ -430,6 +451,7 @@ interface AuthenticatedAdminRouteRouteChildren {
 const AuthenticatedAdminRouteRouteChildren: AuthenticatedAdminRouteRouteChildren =
   {
     AuthenticatedAdminBookingsRoute: AuthenticatedAdminBookingsRoute,
+    AuthenticatedAdminCouponsRoute: AuthenticatedAdminCouponsRoute,
     AuthenticatedAdminMoviesRoute: AuthenticatedAdminMoviesRoute,
     AuthenticatedAdminShowsRoute: AuthenticatedAdminShowsRoute,
     AuthenticatedAdminUsersRoute: AuthenticatedAdminUsersRoute,

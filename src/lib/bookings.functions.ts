@@ -1,6 +1,8 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
+import { loadValidCoupon } from "./coupons.functions";
+
 
 // Atomically lock seats and create a pending booking
 export const createBooking = createServerFn({ method: "POST" })
@@ -12,8 +14,10 @@ export const createBooking = createServerFn({ method: "POST" })
       customerName: z.string().min(1).max(120),
       customerEmail: z.string().email(),
       customerPhone: z.string().min(5).max(20),
+      couponCode: z.string().min(1).max(40).optional().nullable(),
     }).parse(input),
   )
+
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
     const lockUntil = new Date(Date.now() + 10 * 60 * 1000).toISOString();
@@ -40,8 +44,17 @@ export const createBooking = createServerFn({ method: "POST" })
 
     const priceFor = (t: string) => t === "PLATINUM" ? Number(show.price_platinum) : t === "GOLD" ? Number(show.price_gold) : Number(show.price_silver);
     const subtotal = seats.reduce((sum, s) => sum + priceFor(s.seat_type), 0);
-    const gst = +(subtotal * 0.18).toFixed(2);
-    const total = +(subtotal + gst).toFixed(2);
+
+    let discount = 0;
+    let couponCode: string | null = null;
+    if (data.couponCode && data.couponCode.trim()) {
+      const c = await loadValidCoupon(supabase, data.couponCode, subtotal);
+      discount = c.discount;
+      couponCode = c.code;
+    }
+    const discounted = Math.max(0, subtotal - discount);
+    const gst = +(discounted * 0.18).toFixed(2);
+    const total = +(discounted + gst).toFixed(2);
 
     // Lock seats
     const { error: lockErr } = await supabase
@@ -57,7 +70,7 @@ export const createBooking = createServerFn({ method: "POST" })
         user_id: userId,
         show_id: data.showId,
         status: "PENDING",
-        subtotal, gst, total,
+        subtotal, gst, total, discount, coupon_code: couponCode,
         customer_name: data.customerName,
         customer_email: data.customerEmail,
         customer_phone: data.customerPhone,
@@ -65,6 +78,15 @@ export const createBooking = createServerFn({ method: "POST" })
       .select()
       .single();
     if (bErr) throw new Error(bErr.message);
+
+    // Increment coupon usage
+    if (couponCode) {
+      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+      const { data: cur } = await supabaseAdmin.from("coupons").select("used_count").eq("code", couponCode).maybeSingle();
+      if (cur) await supabaseAdmin.from("coupons").update({ used_count: (cur.used_count ?? 0) + 1 }).eq("code", couponCode);
+    }
+
+
 
     // Link seats
     const rows = seats.map((s) => ({ booking_id: booking.id, seat_id: s.id, price: priceFor(s.seat_type) }));

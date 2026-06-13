@@ -14,7 +14,7 @@ export const Route = createFileRoute("/_authenticated/payment/$bookingId")({
   loader: async ({ params }) => {
     const { data, error } = await supabase
       .from("bookings")
-      .select("id,total,status,payment_status,upi_utr,shows(starts_at,screen_name,movies(title))")
+      .select("id,subtotal,gst,discount,coupon_code,total,status,payment_status,upi_utr,shows(starts_at,screen_name,movies(title))")
       .eq("id", params.bookingId)
       .maybeSingle();
     if (error) throw error;
@@ -86,6 +86,19 @@ function PaymentPage() {
         <p className="font-display tracking-[0.4em] text-accent text-xs">{(booking.shows as any)?.movies?.title}</p>
         <h1 className="font-display text-4xl tracking-wider mt-1 mb-2">Complete Payment</h1>
         <p className="text-muted-foreground mb-8">{(booking.shows as any)?.screen_name} • {(booking.shows as any) && new Date((booking.shows as any).starts_at).toLocaleString()}</p>
+
+        <div className="glass-card rounded-xl p-5 mb-6">
+          <h3 className="font-display tracking-widest text-accent text-xs mb-3">BILL SUMMARY</h3>
+          <div className="text-sm text-muted-foreground space-y-1">
+            <div className="flex justify-between"><span>Subtotal</span><span>₹{Number(booking.subtotal ?? 0).toFixed(2)}</span></div>
+            {Number(booking.discount ?? 0) > 0 && (
+              <div className="flex justify-between text-primary"><span>Discount{booking.coupon_code ? ` (${booking.coupon_code})` : ""}</span><span>− ₹{Number(booking.discount).toFixed(2)}</span></div>
+            )}
+            <div className="flex justify-between"><span>GST (18%)</span><span>₹{Number(booking.gst ?? 0).toFixed(2)}</span></div>
+            <div className="flex justify-between font-display text-foreground text-lg pt-2 border-t border-border mt-2"><span>Total</span><span>₹{Number(booking.total).toFixed(2)}</span></div>
+          </div>
+        </div>
+
 
         <div className="grid grid-cols-4 gap-2 mb-6">
           {methods.map((m) => (
