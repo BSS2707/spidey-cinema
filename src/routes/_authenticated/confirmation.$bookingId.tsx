@@ -64,8 +64,10 @@ function ConfirmationPage() {
     line("Phone", booking.customer_phone ?? "");
     y -= 10;
     line("Subtotal", `INR ${Number(booking.subtotal).toFixed(2)}`);
+    if (Number(booking.discount ?? 0) > 0) line(`Discount${booking.coupon_code ? ` (${booking.coupon_code})` : ""}`, `- INR ${Number(booking.discount).toFixed(2)}`);
     line("GST (18%)", `INR ${Number(booking.gst).toFixed(2)}`);
     line("Total Paid", `INR ${Number(booking.total).toFixed(2)}`);
+
     line("Payment", `${booking.payment_status} ${booking.upi_utr ? `(UTR: ${booking.upi_utr})` : ""}`);
 
     // QR
