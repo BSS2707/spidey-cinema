@@ -82,11 +82,10 @@ export const createBooking = createServerFn({ method: "POST" })
     // Increment coupon usage
     if (couponCode) {
       const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-      await supabaseAdmin.rpc("increment_coupon_usage" as any, { _code: couponCode }).then(() => {}, async () => {
-        const { data: cur } = await supabaseAdmin.from("coupons").select("used_count").eq("code", couponCode!).maybeSingle();
-        if (cur) await supabaseAdmin.from("coupons").update({ used_count: (cur.used_count ?? 0) + 1 }).eq("code", couponCode!);
-      });
+      const { data: cur } = await supabaseAdmin.from("coupons").select("used_count").eq("code", couponCode).maybeSingle();
+      if (cur) await supabaseAdmin.from("coupons").update({ used_count: (cur.used_count ?? 0) + 1 }).eq("code", couponCode);
     }
+
 
 
     // Link seats
