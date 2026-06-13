@@ -112,8 +112,13 @@ function ConfirmationPage() {
             <Row label="Seats" value={seats} />
             <Row label="Customer" value={booking.customer_name} />
             <Row label="Subtotal" value={`₹${Number(booking.subtotal).toFixed(2)}`} />
+            <Row label="Subtotal" value={`₹${Number(booking.subtotal).toFixed(2)}`} />
+            {Number(booking.discount ?? 0) > 0 && (
+              <Row label={`Discount${booking.coupon_code ? ` (${booking.coupon_code})` : ""}`} value={`− ₹${Number(booking.discount).toFixed(2)}`} />
+            )}
             <Row label="GST (18%)" value={`₹${Number(booking.gst).toFixed(2)}`} />
             <Row label="Total" value={`₹${Number(booking.total).toFixed(2)}`} bold />
+
             <Row label="Payment" value={`${booking.payment_status}${booking.upi_utr ? ` • UTR ${booking.upi_utr}` : ""}`} />
           </div>
         </div>
