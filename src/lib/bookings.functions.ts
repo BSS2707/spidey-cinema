@@ -14,8 +14,10 @@ export const createBooking = createServerFn({ method: "POST" })
       customerName: z.string().min(1).max(120),
       customerEmail: z.string().email(),
       customerPhone: z.string().min(5).max(20),
+      couponCode: z.string().min(1).max(40).optional().nullable(),
     }).parse(input),
   )
+
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
     const lockUntil = new Date(Date.now() + 10 * 60 * 1000).toISOString();
