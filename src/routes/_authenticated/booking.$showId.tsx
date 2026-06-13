@@ -167,12 +167,30 @@ function BookingPage() {
           <input value={customer.name} onChange={(e) => setCustomer({ ...customer, name: e.target.value })} placeholder="Full name" className="w-full px-3 py-2 rounded bg-input border border-border mb-2" />
           <input value={customer.email} onChange={(e) => setCustomer({ ...customer, email: e.target.value })} placeholder="Email" type="email" className="w-full px-3 py-2 rounded bg-input border border-border mb-2" />
           <input value={customer.phone} onChange={(e) => setCustomer({ ...customer, phone: e.target.value })} placeholder="Phone" className="w-full px-3 py-2 rounded bg-input border border-border mb-4" />
+          <div className="border-t border-border pt-4 mb-4">
+            <label className="text-xs font-display tracking-widest uppercase text-muted-foreground">Coupon</label>
+            {coupon ? (
+              <div className="mt-2 flex items-center justify-between gap-2 px-3 py-2 rounded bg-primary/10 border border-primary/40">
+                <span className="font-display tracking-wider text-primary text-sm">{coupon.code}</span>
+                <button onClick={() => { setCoupon(null); setCouponInput(""); }} className="text-xs text-muted-foreground hover:text-primary">Remove</button>
+              </div>
+            ) : (
+              <div className="mt-2 flex gap-2">
+                <input value={couponInput} onChange={(e) => setCouponInput(e.target.value.toUpperCase())} placeholder="ENTER CODE" className="flex-1 px-3 py-2 rounded bg-input border border-border text-sm uppercase tracking-wider" />
+                <button onClick={applyCoupon} disabled={couponLoading} className="px-3 py-2 rounded bg-accent/20 border border-accent/60 text-accent text-xs font-display tracking-widest uppercase hover:bg-accent/30 disabled:opacity-50">{couponLoading ? "..." : "Apply"}</button>
+              </div>
+            )}
+          </div>
           <div className="text-sm text-muted-foreground space-y-1 border-t border-border pt-4">
             <div className="flex justify-between"><span>Seats</span><span>{selected.size}</span></div>
             <div className="flex justify-between"><span>Subtotal</span><span>₹{subtotal.toFixed(2)}</span></div>
+            {discount > 0 && (
+              <div className="flex justify-between text-primary"><span>Discount {coupon ? `(${coupon.code})` : ""}</span><span>− ₹{discount.toFixed(2)}</span></div>
+            )}
             <div className="flex justify-between"><span>GST (18%)</span><span>₹{gst.toFixed(2)}</span></div>
             <div className="flex justify-between font-display text-foreground text-xl pt-2"><span>Total</span><span>₹{total.toFixed(2)}</span></div>
           </div>
+
           <MagneticButton onClick={handleProceed} disabled={loading || selected.size === 0} className="w-full mt-6">
             {loading ? "..." : "Proceed to Payment"}
           </MagneticButton>
