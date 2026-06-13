@@ -92,7 +92,7 @@ function BookingPage() {
     if (!customer.name || !customer.email || !customer.phone) return toast.error("Fill in your details");
     setLoading(true);
     try {
-      const res = await create({ data: { showId: show.id, seatIds: [...selected], customerName: customer.name, customerEmail: customer.email, customerPhone: customer.phone } });
+      const res = await create({ data: { showId: show.id, seatIds: [...selected], customerName: customer.name, customerEmail: customer.email, customerPhone: customer.phone, couponCode: coupon?.code ?? null } });
       navigate({ to: "/payment/$bookingId", params: { bookingId: res.bookingId } });
     } catch (e) { toast.error(e instanceof Error ? e.message : "Failed"); }
     finally { setLoading(false); }
