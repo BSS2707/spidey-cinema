@@ -28,6 +28,8 @@ function AdminLayout() {
             <Link to="/admin/movies" activeProps={{ className: "text-primary" }} className="text-muted-foreground hover:text-primary">Movies</Link>
             <Link to="/admin/shows" activeProps={{ className: "text-primary" }} className="text-muted-foreground hover:text-primary">Shows</Link>
             <Link to="/admin/bookings" activeProps={{ className: "text-primary" }} className="text-muted-foreground hover:text-primary">Bookings</Link>
+            <Link to="/admin/coupons" activeProps={{ className: "text-primary" }} className="text-muted-foreground hover:text-primary">Coupons</Link>
+
             <Link to="/admin/users" activeProps={{ className: "text-primary" }} className="text-muted-foreground hover:text-primary">Users</Link>
           </nav>
         </div>
