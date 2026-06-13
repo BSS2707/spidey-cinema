@@ -1,6 +1,8 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
+import { loadValidCoupon } from "./coupons.functions";
+
 
 // Atomically lock seats and create a pending booking
 export const createBooking = createServerFn({ method: "POST" })
