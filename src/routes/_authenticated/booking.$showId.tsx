@@ -31,10 +31,14 @@ function BookingPage() {
   const { user } = Route.useRouteContext();
   const navigate = useNavigate();
   const create = useServerFn(createBooking);
+  const validate = useServerFn(validateCoupon);
   const [seats, setSeats] = useState<Seat[]>([]);
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [customer, setCustomer] = useState({ name: user.user_metadata?.full_name ?? "", email: user.email ?? "", phone: user.user_metadata?.phone ?? "" });
   const [loading, setLoading] = useState(false);
+  const [couponInput, setCouponInput] = useState("");
+  const [coupon, setCoupon] = useState<{ code: string; discount: number } | null>(null);
+  const [couponLoading, setCouponLoading] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -45,8 +49,33 @@ function BookingPage() {
 
   const priceFor = (t: string) => t === "PLATINUM" ? Number(show.price_platinum) : t === "GOLD" ? Number(show.price_gold) : Number(show.price_silver);
   const subtotal = seats.filter((s) => selected.has(s.id)).reduce((sum, s) => sum + priceFor(s.seat_type), 0);
-  const gst = +(subtotal * 0.18).toFixed(2);
-  const total = +(subtotal + gst).toFixed(2);
+  const discount = coupon ? Math.min(coupon.discount, subtotal) : 0;
+  const discounted = Math.max(0, subtotal - discount);
+  const gst = +(discounted * 0.18).toFixed(2);
+  const total = +(discounted + gst).toFixed(2);
+
+  const applyCoupon = async () => {
+    if (!couponInput.trim()) return;
+    if (subtotal === 0) return toast.error("Pick seats first");
+    setCouponLoading(true);
+    try {
+      const c = await validate({ data: { code: couponInput, subtotal } });
+      setCoupon({ code: c.code, discount: c.discount });
+      toast.success(`Coupon ${c.code} applied`);
+    } catch (e) { toast.error(e instanceof Error ? e.message : "Invalid coupon"); setCoupon(null); }
+    finally { setCouponLoading(false); }
+  };
+
+  // Re-validate discount when subtotal changes
+  useEffect(() => {
+    if (!coupon) return;
+    if (subtotal === 0) { setCoupon(null); return; }
+    validate({ data: { code: coupon.code, subtotal } })
+      .then((c) => setCoupon({ code: c.code, discount: c.discount }))
+      .catch(() => setCoupon(null));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [subtotal]);
+
 
   const toggle = (s: Seat) => {
     if (s.status === "BOOKED") return;
