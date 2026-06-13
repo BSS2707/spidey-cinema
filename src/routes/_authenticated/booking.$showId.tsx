@@ -5,6 +5,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { Navbar } from "@/components/Navbar";
 import { MagneticButton } from "@/components/MagneticButton";
 import { createBooking } from "@/lib/bookings.functions";
+import { validateCoupon } from "@/lib/coupons.functions";
+
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/booking/$showId")({
