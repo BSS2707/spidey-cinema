@@ -14,7 +14,7 @@ export const Route = createFileRoute("/_authenticated/payment/$bookingId")({
   loader: async ({ params }) => {
     const { data, error } = await supabase
       .from("bookings")
-      .select("id,total,status,payment_status,upi_utr,shows(starts_at,screen_name,movies(title))")
+      .select("id,subtotal,gst,discount,coupon_code,total,status,payment_status,upi_utr,shows(starts_at,screen_name,movies(title))")
       .eq("id", params.bookingId)
       .maybeSingle();
     if (error) throw error;
